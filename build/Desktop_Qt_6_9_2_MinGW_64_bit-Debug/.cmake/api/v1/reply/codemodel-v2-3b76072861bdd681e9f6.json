@@ -1,0 +1,196 @@
+{
+	"configurations" : 
+	[
+		{
+			"directories" : 
+			[
+				{
+					"build" : ".",
+					"hasInstallRule" : true,
+					"jsonFile" : "directory-.-Debug-5a1f77924085b9e4d9f2.json",
+					"minimumCMakeVersion" : 
+					{
+						"string" : "3.16"
+					},
+					"projectIndex" : 0,
+					"source" : ".",
+					"targetIndexes" : 
+					[
+						0,
+						1,
+						2,
+						3,
+						4,
+						5,
+						6,
+						7,
+						8,
+						9,
+						10,
+						11,
+						12,
+						13,
+						14,
+						15
+					]
+				}
+			],
+			"name" : "Debug",
+			"projects" : 
+			[
+				{
+					"directoryIndexes" : 
+					[
+						0
+					],
+					"name" : "eindopdracht_CPP",
+					"targetIndexes" : 
+					[
+						0,
+						1,
+						2,
+						3,
+						4,
+						5,
+						6,
+						7,
+						8,
+						9,
+						10,
+						11,
+						12,
+						13,
+						14,
+						15
+					]
+				}
+			],
+			"targets" : 
+			[
+				{
+					"directoryIndex" : 0,
+					"id" : "all_aotstats::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-all_aotstats-Debug-37cd669fa553f0e6332c.json",
+					"name" : "all_aotstats",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 0,
+					"id" : "all_qmllint::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-all_qmllint-Debug-57e501426d0a23d1e218.json",
+					"name" : "all_qmllint",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 0,
+					"id" : "all_qmllint_json::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-all_qmllint_json-Debug-352d32e2037c2a0541e4.json",
+					"name" : "all_qmllint_json",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 0,
+					"id" : "all_qmllint_module::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-all_qmllint_module-Debug-bde222e1df7ce612b07c.json",
+					"name" : "all_qmllint_module",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 0,
+					"id" : "all_qmltyperegistrations::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-all_qmltyperegistrations-Debug-09e0c179632f123240d7.json",
+					"name" : "all_qmltyperegistrations",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 0,
+					"id" : "appeindopdracht_CPP::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-appeindopdracht_CPP-Debug-58638d3d9fc8b64cf4f3.json",
+					"name" : "appeindopdracht_CPP",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 0,
+					"id" : "appeindopdracht_CPP_autogen::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-appeindopdracht_CPP_autogen-Debug-de3eff55272a2f21d8e9.json",
+					"name" : "appeindopdracht_CPP_autogen",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 0,
+					"id" : "appeindopdracht_CPP_autogen_timestamp_deps::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-appeindopdracht_CPP_autogen_timestamp_deps-Debug-c8e8a5c67a3b029ad5cf.json",
+					"name" : "appeindopdracht_CPP_autogen_timestamp_deps",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 0,
+					"id" : "appeindopdracht_CPP_copy_qml::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-appeindopdracht_CPP_copy_qml-Debug-44d962fb1039ff2a0a84.json",
+					"name" : "appeindopdracht_CPP_copy_qml",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 0,
+					"id" : "appeindopdracht_CPP_copy_res::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-appeindopdracht_CPP_copy_res-Debug-607008398545b6fdb4a2.json",
+					"name" : "appeindopdracht_CPP_copy_res",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 0,
+					"id" : "appeindopdracht_CPP_qmlimportscan::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-appeindopdracht_CPP_qmlimportscan-Debug-db7bbb82f3a726e9cb2e.json",
+					"name" : "appeindopdracht_CPP_qmlimportscan",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 0,
+					"id" : "appeindopdracht_CPP_qmllint::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-appeindopdracht_CPP_qmllint-Debug-2d602120bf30cb9e9391.json",
+					"name" : "appeindopdracht_CPP_qmllint",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 0,
+					"id" : "appeindopdracht_CPP_qmllint_json::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-appeindopdracht_CPP_qmllint_json-Debug-7615b27c0441ba79034d.json",
+					"name" : "appeindopdracht_CPP_qmllint_json",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 0,
+					"id" : "appeindopdracht_CPP_qmllint_module::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-appeindopdracht_CPP_qmllint_module-Debug-69548ef85a21aab9eeba.json",
+					"name" : "appeindopdracht_CPP_qmllint_module",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 0,
+					"id" : "appeindopdracht_CPP_qmltyperegistration::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-appeindopdracht_CPP_qmltyperegistration-Debug-11449a0da266ded69d84.json",
+					"name" : "appeindopdracht_CPP_qmltyperegistration",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 0,
+					"id" : "module_appeindopdracht_CPP_aotstats_target::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-module_appeindopdracht_CPP_aotstats_target-Debug-3723308ff4ebcaaa5bf1.json",
+					"name" : "module_appeindopdracht_CPP_aotstats_target",
+					"projectIndex" : 0
+				}
+			]
+		}
+	],
+	"kind" : "codemodel",
+	"paths" : 
+	{
+		"build" : "C:/Users/Fegor/Documents/C++/eindopdracht_CPP/eindopdracht_CPP/build/Desktop_Qt_6_9_2_MinGW_64_bit-Debug",
+		"source" : "C:/Users/Fegor/Documents/C++/eindopdracht_CPP/eindopdracht_CPP"
+	},
+	"version" : 
+	{
+		"major" : 2,
+		"minor" : 7
+	}
+}

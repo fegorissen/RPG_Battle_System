@@ -1,0 +1,6 @@
+module eindopdracht_CPP
+typeinfo appeindopdracht_CPP.qmltypes
+prefer :/qt/qml/eindopdracht_CPP/
+Main 1.0 Main.qml
+depends QtQuick
+
