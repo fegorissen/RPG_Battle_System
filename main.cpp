@@ -26,13 +26,11 @@ public:
     // Virtual destructor
     virtual ~Character() {}
 
-    // Getters & setters (encapsulation)
     std::string getName() const { return name; }
     int getHealth() const { return health; }
     int getMaxHealth() const { return maxHealth; }
     void setHealth(int h) { health = h; }
 
-    // Virtual function (polymorphism)
     virtual void attack(Character& target) {
         static std::mt19937 rng(static_cast<unsigned>(time(nullptr)));
         std::uniform_int_distribution<int> damageDist(static_cast<int>(attackPower * 0.8), static_cast<int>(attackPower * 1.2));
@@ -65,6 +63,11 @@ public:
     // Copy constructor
     Player(const Player& other) : Character(other), inventory(other.inventory) {}
 
+    // Destructor
+    ~Player() {
+        std::cout << name << " has been destroyed.\n";
+    }
+
     void addItem(const std::string& item) { inventory.push_back(item); }
 
     void showInventory() const {
@@ -93,6 +96,11 @@ public:
     // Copy constructor
     Monster(const Monster& other) : Character(other) {}
 
+    // Destructor
+    ~Monster() {
+        std::cout << name << " has been destroyed.\n";
+    }
+
     void attack(Character& target) override {
         std::cout << name << " fiercely attacks!\n";
         Character::attack(target);
@@ -100,7 +108,7 @@ public:
 };
 
 // ----------------------------
-// Game class (object composition)
+// Game class
 // ----------------------------
 class Game {
 private:
@@ -108,7 +116,6 @@ private:
     Monster monster;
 
 public:
-    // Gebruik parameterized constructors
     Game() : player("Hero", 100, 12), monster("Goblin", 100, 10) {}
 
     void start() {
