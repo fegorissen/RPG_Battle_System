@@ -49,6 +49,10 @@ private:
     std::vector<std::string> inventory;
 
 public:
+    // Default constructor
+    Player() : Character("DefaultHero", 100, 12) {}
+
+    // Parameterized constructor
     Player(const std::string& n, int h, int a) : Character(n, h, a) {}
 
     void addItem(const std::string& item) { inventory.push_back(item); }
@@ -70,6 +74,10 @@ public:
 // ----------------------------
 class Monster : public Character {
 public:
+    // Default constructor
+    Monster() : Character("DefaultGoblin", 100, 10) {}
+
+    // Parameterized constructor
     Monster(const std::string& n, int h, int a) : Character(n, h, a) {}
 
     void attack(Character& target) override {
@@ -87,7 +95,7 @@ private:
     Monster monster;
 
 public:
-    // Max HP = 100, verhoogde attackPower voor kortere gevechten
+    // Gebruik parameterized constructors met max HP en gebalanceerde attackPower
     Game()
         : player("Hero", 100, 12),
         monster("Goblin", 100, 10)
