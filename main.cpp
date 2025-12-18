@@ -15,15 +15,12 @@ protected:
     const int maxHealth;
 
 public:
-    // Parameterized constructor met initializer list
     Character(const std::string& n, int h, int a)
         : name(n), health(h), attackPower(a), maxHealth(h) {}
 
-    // Copy constructor
     Character(const Character& other)
         : name(other.name), health(other.health), attackPower(other.attackPower), maxHealth(other.maxHealth) {}
 
-    // Virtual destructor
     virtual ~Character() {}
 
     std::string getName() const { return name; }
@@ -31,11 +28,10 @@ public:
     int getMaxHealth() const { return maxHealth; }
     void setHealth(int h) { health = h; }
 
-    // Virtual function (dynamische polymorfie)
-    virtual void attack(Character& target) {
+    virtual void attack(Character& target, int multiplier = 1) { // Standaardwaarde toegevoegd
         static std::mt19937 rng(static_cast<unsigned>(time(nullptr)));
-        std::uniform_int_distribution<int> damageDist(static_cast<int>(attackPower * 0.8), static_cast<int>(attackPower * 1.2));
-
+        std::uniform_int_distribution<int> damageDist(static_cast<int>(attackPower * 0.8 * multiplier),
+                                                      static_cast<int>(attackPower * 1.2 * multiplier));
         int damage = damageDist(rng);
         target.health -= damage;
         if (target.health < 0) target.health = 0;
@@ -55,29 +51,28 @@ private:
     std::vector<std::string> inventory;
 
 public:
-    // Default constructor forwarded naar parameterized constructor
     Player() : Player("DefaultHero", 100, 12) {}
-
-    // Parameterized constructor
     Player(const std::string& n, int h, int a) : Character(n, h, a), inventory() {}
-
-    // Copy constructor
     Player(const Player& other) : Character(other), inventory(other.inventory) {}
-
-    // Destructor
     ~Player() { std::cout << name << " has been destroyed.\n"; }
 
     void addItem(const std::string& item) { inventory.push_back(item); }
-
     void showInventory() const {
         std::cout << name << "'s Inventory: ";
         for (auto& item : inventory) std::cout << item << " ";
         std::cout << "\n";
     }
 
-    void attack(Character& target) override {
+    void attack(Character& target, int multiplier = 1) override { // polymorfisme + standaardwaarde
         std::cout << name << " bravely attacks!\n";
-        Character::attack(target);
+        Character::attack(target, multiplier);
+    }
+
+    // Nuttige lidfunctie: heal met standaardwaarde
+    void heal(int amount = 20) { // standaardwaarde 20 HP
+        health += amount;
+        if (health > maxHealth) health = maxHealth;
+        std::cout << name << " heals for " << amount << " HP! (Current HP: " << health << ")\n";
     }
 };
 
@@ -86,21 +81,14 @@ public:
 // ----------------------------
 class Monster : public Character {
 public:
-    // Default constructor forwarded naar parameterized constructor
     Monster() : Monster("DefaultGoblin", 100, 10) {}
-
-    // Parameterized constructor
     Monster(const std::string& n, int h, int a) : Character(n, h, a) {}
-
-    // Copy constructor
     Monster(const Monster& other) : Character(other) {}
-
-    // Destructor
     ~Monster() { std::cout << name << " has been destroyed.\n"; }
 
-    void attack(Character& target) override {
+    void attack(Character& target, int multiplier = 1) override {
         std::cout << name << " fiercely attacks!\n";
-        Character::attack(target);
+        Character::attack(target, multiplier);
     }
 };
 
@@ -134,14 +122,18 @@ public:
 
         while (player->isAlive() && monster->isAlive()) {
             if (playerTurn) {
-                player->attack(*monster);
-                if (monster->isAlive())
-                    monster->attack(*player);
+                player->attack(*monster); // polymorfie
+                if (monster->isAlive()) monster->attack(*player);
             } else {
                 monster->attack(*player);
-                if (player->isAlive())
-                    player->attack(*monster);
+                if (player->isAlive()) player->attack(*monster);
             }
+
+            // Voorbeeld: Player geneest soms automatisch (optioneel)
+            if (playerTurn && player->getHealth() < 50) {
+                dynamic_cast<Player*>(player)->heal(); // standaard heal van 20 HP
+            }
+
             playerTurn = !playerTurn;
         }
 
