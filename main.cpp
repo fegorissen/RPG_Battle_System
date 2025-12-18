@@ -23,13 +23,16 @@ public:
     Character(const Character& other)
         : name(other.name), health(other.health), attackPower(other.attackPower), maxHealth(other.maxHealth) {}
 
+    // Virtual destructor
     virtual ~Character() {}
 
+    // Getters & setters (encapsulation)
     std::string getName() const { return name; }
     int getHealth() const { return health; }
     int getMaxHealth() const { return maxHealth; }
     void setHealth(int h) { health = h; }
 
+    // Virtual function (polymorphism)
     virtual void attack(Character& target) {
         static std::mt19937 rng(static_cast<unsigned>(time(nullptr)));
         std::uniform_int_distribution<int> damageDist(static_cast<int>(attackPower * 0.8), static_cast<int>(attackPower * 1.2));
@@ -59,6 +62,9 @@ public:
     // Parameterized constructor
     Player(const std::string& n, int h, int a) : Character(n, h, a) {}
 
+    // Copy constructor
+    Player(const Player& other) : Character(other), inventory(other.inventory) {}
+
     void addItem(const std::string& item) { inventory.push_back(item); }
 
     void showInventory() const {
@@ -84,6 +90,9 @@ public:
     // Parameterized constructor
     Monster(const std::string& n, int h, int a) : Character(n, h, a) {}
 
+    // Copy constructor
+    Monster(const Monster& other) : Character(other) {}
+
     void attack(Character& target) override {
         std::cout << name << " fiercely attacks!\n";
         Character::attack(target);
@@ -91,7 +100,7 @@ public:
 };
 
 // ----------------------------
-// Game class
+// Game class (object composition)
 // ----------------------------
 class Game {
 private:
@@ -99,11 +108,8 @@ private:
     Monster monster;
 
 public:
-    // Gebruik parameterized constructors met max HP en gebalanceerde attackPower
-    Game()
-        : player("Hero", 100, 12),
-        monster("Goblin", 100, 10)
-    {}
+    // Gebruik parameterized constructors
+    Game() : player("Hero", 100, 12), monster("Goblin", 100, 10) {}
 
     void start() {
         std::cout << "Battle begins between " << player.getName()
