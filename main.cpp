@@ -15,10 +15,14 @@ protected:
     const int maxHealth;
 
 public:
+    // Parameterized constructor
     Character(const std::string& n, int h, int a)
         : name(n), health(h), attackPower(a), maxHealth(h) {}
+
+    // Copy constructor
     Character(const Character& other)
         : name(other.name), health(other.health), attackPower(other.attackPower), maxHealth(other.maxHealth) {}
+
     virtual ~Character() {}
 
     std::string getName() const { return name; }
