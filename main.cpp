@@ -31,7 +31,7 @@ public:
     int getMaxHealth() const { return maxHealth; }
     void setHealth(int h) { health = h; }
 
-    // Virtual function (polymorphism)
+    // Virtual function (dynamische polymorfie)
     virtual void attack(Character& target) {
         static std::mt19937 rng(static_cast<unsigned>(time(nullptr)));
         std::uniform_int_distribution<int> damageDist(static_cast<int>(attackPower * 0.8), static_cast<int>(attackPower * 1.2));
@@ -109,39 +109,47 @@ public:
 // ----------------------------
 class Game {
 private:
-    Player player;
-    Monster monster;
+    Character* player;
+    Character* monster;
 
 public:
-    Game() : player("Hero", 100, 12), monster("Goblin", 100, 10) {}
+    Game() {
+        player = new Player("Hero", 100, 12);
+        monster = new Monster("Goblin", 100, 10);
+    }
+
+    ~Game() {
+        delete player;
+        delete monster;
+    }
 
     void start() {
-        std::cout << "Battle begins between " << player.getName()
-        << " (HP: " << player.getHealth() << "/" << player.getMaxHealth() << ") and "
-        << monster.getName() << " (HP: " << monster.getHealth() << "/" << monster.getMaxHealth() << ")!\n\n";
+        std::cout << "Battle begins between " << player->getName()
+        << " (HP: " << player->getHealth() << "/" << player->getMaxHealth() << ") and "
+        << monster->getName() << " (HP: " << monster->getHealth() << "/" << monster->getMaxHealth() << ")!\n\n";
 
         std::mt19937 rng(static_cast<unsigned>(time(nullptr)));
         std::uniform_int_distribution<int> coin(0,1);
         bool playerTurn = coin(rng) == 0;
 
-        while (player.isAlive() && monster.isAlive()) {
+        while (player->isAlive() && monster->isAlive()) {
             if (playerTurn) {
-                player.attack(monster);
-                if (monster.isAlive())
-                    monster.attack(player);
+                player->attack(*monster);
+                if (monster->isAlive())
+                    monster->attack(*player);
             } else {
-                monster.attack(player);
-                if (player.isAlive())
-                    player.attack(monster);
+                monster->attack(*player);
+                if (player->isAlive())
+                    player->attack(*monster);
             }
             playerTurn = !playerTurn;
         }
 
         std::cout << "\nBattle Result: ";
-        if (player.isAlive())
-            std::cout << player.getName() << " wins!\n";
+        if (player->isAlive())
+            std::cout << player->getName() << " wins!\n";
         else
-            std::cout << monster.getName() << " wins!\n";
+            std::cout << monster->getName() << " wins!\n";
     }
 };
 
