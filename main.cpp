@@ -15,7 +15,7 @@ protected:
     const int maxHealth;
 
 public:
-    // Parameterized constructor
+    // Parameterized constructor met initializer list
     Character(const std::string& n, int h, int a)
         : name(n), health(h), attackPower(a), maxHealth(h) {}
 
@@ -31,6 +31,7 @@ public:
     int getMaxHealth() const { return maxHealth; }
     void setHealth(int h) { health = h; }
 
+    // Virtual function (polymorphism)
     virtual void attack(Character& target) {
         static std::mt19937 rng(static_cast<unsigned>(time(nullptr)));
         std::uniform_int_distribution<int> damageDist(static_cast<int>(attackPower * 0.8), static_cast<int>(attackPower * 1.2));
@@ -54,19 +55,17 @@ private:
     std::vector<std::string> inventory;
 
 public:
-    // Default constructor
-    Player() : Character("DefaultHero", 100, 12) {}
+    // Default constructor forwarded naar parameterized constructor
+    Player() : Player("DefaultHero", 100, 12) {}
 
     // Parameterized constructor
-    Player(const std::string& n, int h, int a) : Character(n, h, a) {}
+    Player(const std::string& n, int h, int a) : Character(n, h, a), inventory() {}
 
     // Copy constructor
     Player(const Player& other) : Character(other), inventory(other.inventory) {}
 
     // Destructor
-    ~Player() {
-        std::cout << name << " has been destroyed.\n";
-    }
+    ~Player() { std::cout << name << " has been destroyed.\n"; }
 
     void addItem(const std::string& item) { inventory.push_back(item); }
 
@@ -87,8 +86,8 @@ public:
 // ----------------------------
 class Monster : public Character {
 public:
-    // Default constructor
-    Monster() : Character("DefaultGoblin", 100, 10) {}
+    // Default constructor forwarded naar parameterized constructor
+    Monster() : Monster("DefaultGoblin", 100, 10) {}
 
     // Parameterized constructor
     Monster(const std::string& n, int h, int a) : Character(n, h, a) {}
@@ -97,9 +96,7 @@ public:
     Monster(const Monster& other) : Character(other) {}
 
     // Destructor
-    ~Monster() {
-        std::cout << name << " has been destroyed.\n";
-    }
+    ~Monster() { std::cout << name << " has been destroyed.\n"; }
 
     void attack(Character& target) override {
         std::cout << name << " fiercely attacks!\n";
@@ -108,7 +105,7 @@ public:
 };
 
 // ----------------------------
-// Game class
+// Game class (object composition)
 // ----------------------------
 class Game {
 private:
