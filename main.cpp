@@ -64,6 +64,7 @@ public:
     inline bool isAlive() const { return health > 0; }
     inline unsigned char getLevel() const { return level; }
 
+    // Modern call-by-reference (1)
     virtual void attack(Character& target, const int& multiplier = 1) {
         if(isStunned) {
             std::cout << name << " is stunned and cannot attack!\n";
@@ -94,6 +95,12 @@ public:
         if(criticalHit) std::cout << " (CRITICAL HIT!)";
         if(target.hasShield) std::cout << " [Blocked by shield]";
         std::cout << "\n";
+    }
+
+    // Modern call-by-reference (2)
+    void applyDamage(int& targetHealth, const int& damage) {
+        targetHealth -= damage;
+        if(targetHealth < 0) targetHealth = 0;
     }
 };
 
@@ -142,6 +149,10 @@ public:
         if(health > maxHealth) health = maxHealth;
         std::cout << name << " heals for " << amount << " HP!\n";
     }
+
+    void addItem(std::string& item) { // call-by-reference
+        inventory.push_back(item);
+    }
 };
 
 // ----------------------------
@@ -179,7 +190,6 @@ private:
 
 public:
     Game() {
-        // Dynamische geheugenallocatie
         player = new Player();
 
         monsters.push_back(new Monster("Goblin", 80, 12, 1, 10));
@@ -188,13 +198,12 @@ public:
     }
 
     ~Game() {
-        // Dynamisch geheugen verwijderen
-        delete player; // verwijder dynamisch aangemaakte player
+        delete player;
 
         for(auto m : monsters) {
-            delete m; // verwijder dynamisch aangemaakte monsters
+            delete m;
         }
-        monsters.clear(); // vector opschonen
+        monsters.clear();
     }
 
     void start() {
