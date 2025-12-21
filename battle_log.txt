@@ -1,0 +1,72 @@
+Hero attacks Goblin for 14 damage
+[LOG] Goblin (Lv 1) HP: 66/80
+Goblin attacks Hero for 9 damage
+[LOG] Hero (Lv 1) HP: 91/100
+Hero attacks Goblin for 16 damage
+[LOG] Goblin (Lv 1) HP: 50/80
+Goblin attacks Hero for 19 damage (CRITICAL HIT!)
+[LOG] Hero (Lv 1) HP: 72/100
+Hero attacks Goblin for 18 damage
+[LOG] Goblin (Lv 1) HP: 32/80
+Goblin attacks Hero for 12 damage
+[LOG] Hero (Lv 1) HP: 60/100
+Hero attacks Goblin for 18 damage
+[LOG] Goblin (Lv 1) HP: 14/80
+Goblin attacks Hero for 9 damage
+[LOG] Hero (Lv 1) HP: 51/100
+Hero attacks Goblin for 18 damage
+[LOG] Goblin (Lv 1) HP: 0/80
+Hero attacks Orc for 32 damage (CRITICAL HIT!)
+[LOG] Orc (Lv 2) HP: 88/120
+Orc attacks Hero for 14 damage
+[LOG] Hero (Lv 1) HP: 37/100
+[LOG] Hero (Lv 1) HP: 57/100
+Hero attacks Orc for 36 damage (CRITICAL HIT!)
+[LOG] Orc (Lv 2) HP: 52/120
+Orc attacks Hero for 19 damage
+[LOG] Hero (Lv 1) HP: 38/100
+[LOG] Hero (Lv 1) HP: 58/100
+Hero attacks Orc for 14 damage
+[LOG] Orc (Lv 2) HP: 38/120
+Orc attacks Hero for 39 damage (CRITICAL HIT!)
+[LOG] Hero (Lv 1) HP: 19/100
+[LOG] Hero (Lv 1) HP: 39/100
+Hero attacks Orc for 16 damage
+[LOG] Orc (Lv 2) HP: 22/120
+Orc attacks Hero for 21 damage
+[LOG] Hero (Lv 1) HP: 18/100
+[LOG] Hero (Lv 1) HP: 38/100
+Hero attacks Orc for 36 damage (CRITICAL HIT!)
+[LOG] Orc (Lv 2) HP: 0/120
+Hero attacks Troll for 16 damage
+[LOG] Troll (Lv 3) HP: 134/150
+Troll attacks Hero for 16 damage
+[LOG] Hero (Lv 1) HP: 22/100
+[LOG] Hero (Lv 1) HP: 42/100
+Hero attacks Troll for 19 damage
+[LOG] Troll (Lv 3) HP: 115/150
+Troll attacks Hero for 20 damage
+[LOG] Hero (Lv 1) HP: 22/100
+[LOG] Hero (Lv 1) HP: 42/100
+Hero attacks Troll for 19 damage
+[LOG] Troll (Lv 3) HP: 96/150
+Troll attacks Hero for 24 damage
+[LOG] Hero (Lv 1) HP: 18/100
+[LOG] Hero (Lv 1) HP: 38/100
+Hero attacks Troll for 43 damage (CRITICAL HIT!)
+[LOG] Troll (Lv 3) HP: 53/150
+Troll attacks Hero for 20 damage
+[LOG] Hero (Lv 1) HP: 18/100
+[LOG] Hero (Lv 1) HP: 38/100
+Hero attacks Troll for 16 damage
+[LOG] Troll (Lv 3) HP: 37/150
+Troll attacks Hero for 24 damage
+[LOG] Hero (Lv 1) HP: 14/100
+[LOG] Hero (Lv 1) HP: 34/100
+Hero attacks Troll for 21 damage
+[LOG] Troll (Lv 3) HP: 16/150
+Troll attacks Hero for 24 damage
+[LOG] Hero (Lv 1) HP: 10/100
+[LOG] Hero (Lv 1) HP: 30/100
+Hero attacks Troll for 21 damage
+[LOG] Troll (Lv 3) HP: 0/150

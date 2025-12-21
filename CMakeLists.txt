@@ -17,6 +17,9 @@ qt_add_qml_module(appeindopdracht_CPP
     VERSION 1.0
     QML_FILES
         Main.qml
+        SOURCES rpg_tests.h
+        SOURCES rpg_classes.h rpg_classes.cpp
+        SOURCES rpg_tests.h rpg_tests.cpp
 )
 
 # Qt for iOS sets MACOSX_BUNDLE_GUI_IDENTIFIER automatically since Qt 6.1.
