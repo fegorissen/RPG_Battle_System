@@ -4,9 +4,6 @@
 #include <random>
 #include <ctime>
 
-// ============================
-// Zelfgemaakte namespace
-// ============================
 namespace rpg {
 
 // ----------------------------
@@ -24,7 +21,6 @@ class BattleLogger;
 // Abstracte basisklasse Character
 // ----------------------------
 class Character {
-    // OOP-eis: nuttige friend class
     friend class BattleLogger;
 
 protected:
@@ -33,15 +29,28 @@ protected:
     int attackPower;
     const int maxHealth;
 
+    // ✅ Memory-efficiënte types
+    unsigned char level;           // 0–255 is genoeg voor level
+    unsigned char criticalChance;  // 0–100 (%)
+
 public:
-    Character(const std::string& n, int h, int a)
-        : name(n), health(h), attackPower(a), maxHealth(h) {}
+    Character(const std::string& n, int h, int a,
+              unsigned char lvl = 1,
+              unsigned char crit = 10)
+        : name(n),
+        health(h),
+        attackPower(a),
+        maxHealth(h),
+        level(lvl),
+        criticalChance(crit) {}
 
     Character(const Character& other)
         : name(other.name),
         health(other.health),
         attackPower(other.attackPower),
-        maxHealth(other.maxHealth) {}
+        maxHealth(other.maxHealth),
+        level(other.level),
+        criticalChance(other.criticalChance) {}
 
     virtual ~Character() {}
 
@@ -49,19 +58,28 @@ public:
     inline int getHealth() const { return health; }
     inline int getMaxHealth() const { return maxHealth; }
     inline bool isAlive() const { return health > 0; }
+    inline unsigned char getLevel() const { return level; }
 
     virtual void attack(Character& target, int multiplier = 1) {
         static std::mt19937 rng(static_cast<unsigned>(time(nullptr)));
         std::uniform_int_distribution<int> variation(8, 12);
+        std::uniform_int_distribution<int> critRoll(1, 100);
+
+        bool criticalHit = critRoll(rng) <= criticalChance;
 
         int rawDamage = calculateDamage<int>(attackPower, multiplier);
-        int damage = calculateDamage<int>(rawDamage, variation(rng) / 10.0);
+        int damage = calculateDamage<int>(
+            rawDamage,
+            variation(rng) / 10.0 * (criticalHit ? 2.0 : 1.0)
+            );
 
         target.health -= damage;
         if (target.health < 0) target.health = 0;
 
         std::cout << name << " attacks " << target.getName()
-                  << " for " << damage << " damage!\n";
+                  << " for " << damage << " damage";
+        if (criticalHit) std::cout << " (CRITICAL HIT!)";
+        std::cout << "\n";
     }
 };
 
@@ -72,7 +90,8 @@ class BattleLogger {
 public:
     static void logStatus(const Character& c) {
         std::cout << "[LOG] " << c.name
-                  << " HP: " << c.health
+                  << " (Lv " << static_cast<int>(c.level) << ") "
+                  << "HP: " << c.health
                   << "/" << c.maxHealth << "\n";
     }
 };
@@ -85,10 +104,12 @@ private:
     std::vector<std::string> inventory;
 
 public:
-    Player() : Player("Hero", 100, 15) {}
+    Player() : Player("Hero", 100, 18, 1, 20) {}
 
-    Player(const std::string& n, int h, int a)
-        : Character(n, h, a), inventory() {}
+    Player(const std::string& n, int h, int a,
+           unsigned char lvl,
+           unsigned char crit)
+        : Character(n, h, a, lvl, crit), inventory() {}
 
     Player(const Player& other)
         : Character(other), inventory(other.inventory) {}
@@ -112,10 +133,12 @@ public:
 // ----------------------------
 class Monster : public Character {
 public:
-    Monster() : Monster("Goblin", 100, 12) {}
+    Monster() : Monster("Goblin", 100, 15, 1, 10) {}
 
-    Monster(const std::string& n, int h, int a)
-        : Character(n, h, a) {}
+    Monster(const std::string& n, int h, int a,
+            unsigned char lvl,
+            unsigned char crit)
+        : Character(n, h, a, lvl, crit) {}
 
     Monster(const Monster& other)
         : Character(other) {}
@@ -175,7 +198,7 @@ public:
     }
 };
 
-} // einde namespace rpg
+} // namespace rpg
 
 // ----------------------------
 // main
