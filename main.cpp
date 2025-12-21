@@ -4,7 +4,8 @@
 #include <random>
 #include <ctime>
 #include <sstream>
-#include <fstream> // ✅ moderne file-I/O
+#include <fstream>
+#include <exception>
 
 namespace rpg {
 
@@ -97,20 +98,23 @@ public:
         if(target.hasShield) std::cout << " [Blocked by shield]";
         std::cout << "\n";
 
-        // File output
-        std::ofstream logfile("battle_log.txt", std::ios::app);
-        if(logfile.is_open()) {
+        // File output with exception handling
+        try {
+            std::ofstream logfile("battle_log.txt", std::ios::app);
+            if (!logfile) throw std::ios_base::failure("Cannot open battle_log.txt");
             logfile << name << " attacks " << target.getName()
-            << " for " << damage << " damage";
+                    << " for " << damage << " damage";
             if(criticalHit) logfile << " (CRITICAL HIT!)";
             if(target.hasShield) logfile << " [Blocked by shield]";
             logfile << "\n";
+        } catch (const std::ios_base::failure& e) {
+            std::cerr << "File I/O error: " << e.what() << "\n";
         }
     }
 };
 
 // ----------------------------
-// Friend class
+// Friend class BattleLogger
 // ----------------------------
 class BattleLogger {
 public:
@@ -121,13 +125,16 @@ public:
                   << "HP: " << c.health
                   << "/" << c.maxHealth << "\n";
 
-        // File
-        std::ofstream logfile("battle_log.txt", std::ios::app);
-        if(logfile.is_open()) {
+        // File with exception handling
+        try {
+            std::ofstream logfile("battle_log.txt", std::ios::app);
+            if (!logfile) throw std::ios_base::failure("Cannot open battle_log.txt");
             logfile << "[LOG] " << c.name
                     << " (Lv " << static_cast<int>(c.level) << ") "
                     << "HP: " << c.health
                     << "/" << c.maxHealth << "\n";
+        } catch (const std::ios_base::failure& e) {
+            std::cerr << "File I/O error: " << e.what() << "\n";
         }
     }
 };
@@ -161,9 +168,12 @@ public:
         if (health > maxHealth) health = maxHealth;
         std::cout << name << " heals for " << amount << " HP!\n";
 
-        std::ofstream logfile("battle_log.txt", std::ios::app);
-        if(logfile.is_open()) {
+        try {
+            std::ofstream logfile("battle_log.txt", std::ios::app);
+            if (!logfile) throw std::ios_base::failure("Cannot open battle_log.txt");
             logfile << name << " heals for " << amount << " HP\n";
+        } catch (const std::ios_base::failure& e) {
+            std::cerr << "File I/O error: " << e.what() << "\n";
         }
     }
 
@@ -215,11 +225,17 @@ private:
 
 public:
     Game() {
-        player = new Player();
+        try {
+            player = new Player();
 
-        monsters.push_back(new Monster("Goblin", 80, 12, 1, 10));
-        monsters.push_back(new Monster("Orc", 120, 18, 2, 15));
-        monsters.push_back(new Monster("Troll", 150, 20, 3, 5));
+            monsters.push_back(new Monster("Goblin", 80, 12, 1, 10));
+            monsters.push_back(new Monster("Orc", 120, 18, 2, 15));
+            monsters.push_back(new Monster("Troll", 150, 20, 3, 5));
+        } catch (const std::bad_alloc& e) {
+            std::cerr << "Memory allocation failed: " << e.what() << "\n";
+            player = nullptr;
+            monsters.clear();
+        }
     }
 
     ~Game() {
@@ -293,18 +309,25 @@ public:
 // main
 // ----------------------------
 int main() {
-    using namespace rpg;
+    try {
+        using namespace rpg;
 
-    Game game;
+        Game game;
 
-    std::string sword = "Sword";
-    std::string shield = "Shield";
+        std::string sword = "Sword";
+        std::string shield = "Shield";
 
-    if(game.getPlayer() != nullptr) {
-        game.getPlayer()->addItem(sword);
-        game.getPlayer()->addItem(shield);
+        if(game.getPlayer() != nullptr) {
+            game.getPlayer()->addItem(sword);
+            game.getPlayer()->addItem(shield);
+        }
+
+        game.start();
+    } catch (const std::exception& e) {
+        std::cerr << "Unexpected error: " << e.what() << "\n";
+    } catch (...) {
+        std::cerr << "Unknown error occurred!\n";
     }
 
-    game.start();
     return 0;
 }
