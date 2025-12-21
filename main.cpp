@@ -32,7 +32,7 @@ protected:
     unsigned char level;
     unsigned char criticalChance;
 
-    // ✅ Nuttige bool variabelen
+    // Nuttige bool variabelen
     bool isStunned;
     bool hasShield;
     bool criticalActive;
@@ -67,7 +67,7 @@ public:
     virtual void attack(Character& target, const int& multiplier = 1) {
         if(isStunned) {
             std::cout << name << " is stunned and cannot attack!\n";
-            isStunned = false; // stunned only for 1 turn
+            isStunned = false;
             return;
         }
 
@@ -175,41 +175,56 @@ public:
 class Game {
 private:
     Character* player;
-    Character* monster;
+    std::vector<Character*> monsters;
 
 public:
     Game() {
+        // Dynamische geheugenallocatie
         player = new Player();
-        monster = new Monster();
+
+        monsters.push_back(new Monster("Goblin", 80, 12, 1, 10));
+        monsters.push_back(new Monster("Orc", 120, 18, 2, 15));
+        monsters.push_back(new Monster("Troll", 150, 20, 3, 5));
     }
 
     ~Game() {
-        delete player;
-        delete monster;
+        // Dynamisch geheugen verwijderen
+        delete player; // verwijder dynamisch aangemaakte player
+
+        for(auto m : monsters) {
+            delete m; // verwijder dynamisch aangemaakte monsters
+        }
+        monsters.clear(); // vector opschonen
     }
 
     void start() {
         std::cout << "Battle start!\n\n";
 
-        while(player->isAlive() && monster->isAlive()) {
-            player->attack(*monster);
-            BattleLogger::logStatus(*monster);
+        for(auto m : monsters) {
+            std::cout << "Next battle: " << m->getName() << "\n";
 
-            if(!monster->isAlive()) break;
+            while(player->isAlive() && m->isAlive()) {
+                player->attack(*m);
+                BattleLogger::logStatus(*m);
 
-            monster->attack(*player);
-            BattleLogger::logStatus(*player);
+                if(!m->isAlive()) break;
 
-            if(player->getHealth() < 40) {
-                dynamic_cast<Player*>(player)->heal();
+                m->attack(*player);
                 BattleLogger::logStatus(*player);
+
+                if(player->getHealth() < 40) {
+                    dynamic_cast<Player*>(player)->heal();
+                    BattleLogger::logStatus(*player);
+                }
+
+                std::cout << "--------------------\n";
             }
 
-            std::cout << "--------------------\n";
+            if(!player->isAlive()) break;
         }
 
         std::cout << "\nWinner: "
-                  << (player->isAlive() ? player->getName() : monster->getName())
+                  << (player->isAlive() ? player->getName() : "Monsters")
                   << "\n";
     }
 };
