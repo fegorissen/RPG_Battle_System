@@ -10,7 +10,7 @@ namespace rpg {
 // Template functie
 // ----------------------------
 template<typename T>
-T calculateDamage(T baseDamage, double multiplier = 1.0) {
+T calculateDamage(const T& baseDamage, const double& multiplier = 1.0) {
     return static_cast<T>(baseDamage * multiplier);
 }
 
@@ -29,14 +29,15 @@ protected:
     int attackPower;
     const int maxHealth;
 
-    // ✅ Memory-efficiënte types
-    unsigned char level;           // 0–255 is genoeg voor level
-    unsigned char criticalChance;  // 0–100 (%)
+    unsigned char level;
+    unsigned char criticalChance;
 
 public:
-    Character(const std::string& n, int h, int a,
-              unsigned char lvl = 1,
-              unsigned char crit = 10)
+    Character(const std::string& n,
+              const int& h,
+              const int& a,
+              const unsigned char& lvl = 1,
+              const unsigned char& crit = 10)
         : name(n),
         health(h),
         attackPower(a),
@@ -106,9 +107,11 @@ private:
 public:
     Player() : Player("Hero", 100, 18, 1, 20) {}
 
-    Player(const std::string& n, int h, int a,
-           unsigned char lvl,
-           unsigned char crit)
+    Player(const std::string& n,
+           const int& h,
+           const int& a,
+           const unsigned char& lvl,
+           const unsigned char& crit)
         : Character(n, h, a, lvl, crit), inventory() {}
 
     Player(const Player& other)
@@ -121,7 +124,7 @@ public:
         Character::attack(target, multiplier);
     }
 
-    void heal(int amount = 20) {
+    void heal(const int& amount = 20) {
         health += amount;
         if (health > maxHealth) health = maxHealth;
         std::cout << name << " heals for " << amount << " HP!\n";
@@ -135,9 +138,11 @@ class Monster : public Character {
 public:
     Monster() : Monster("Goblin", 100, 15, 1, 10) {}
 
-    Monster(const std::string& n, int h, int a,
-            unsigned char lvl,
-            unsigned char crit)
+    Monster(const std::string& n,
+            const int& h,
+            const int& a,
+            const unsigned char& lvl,
+            const unsigned char& crit)
         : Character(n, h, a, lvl, crit) {}
 
     Monster(const Monster& other)
