@@ -4,6 +4,11 @@
 #include <random>
 #include <ctime>
 
+// ============================
+// Zelfgemaakte namespace
+// ============================
+namespace rpg {
+
 // ----------------------------
 // Template functie
 // ----------------------------
@@ -33,8 +38,10 @@ public:
         : name(n), health(h), attackPower(a), maxHealth(h) {}
 
     Character(const Character& other)
-        : name(other.name), health(other.health),
-        attackPower(other.attackPower), maxHealth(other.maxHealth) {}
+        : name(other.name),
+        health(other.health),
+        attackPower(other.attackPower),
+        maxHealth(other.maxHealth) {}
 
     virtual ~Character() {}
 
@@ -61,7 +68,6 @@ public:
 // ----------------------------
 // Friend class
 // ----------------------------
-// OOP-eis: nuttige friend functie/klasse
 class BattleLogger {
 public:
     static void logStatus(const Character& c) {
@@ -80,10 +86,13 @@ private:
 
 public:
     Player() : Player("Hero", 100, 15) {}
+
     Player(const std::string& n, int h, int a)
         : Character(n, h, a), inventory() {}
+
     Player(const Player& other)
         : Character(other), inventory(other.inventory) {}
+
     ~Player() {}
 
     void attack(Character& target, int multiplier = 1) override {
@@ -104,10 +113,13 @@ public:
 class Monster : public Character {
 public:
     Monster() : Monster("Goblin", 100, 12) {}
+
     Monster(const std::string& n, int h, int a)
         : Character(n, h, a) {}
+
     Monster(const Monster& other)
         : Character(other) {}
+
     ~Monster() {}
 
     void attack(Character& target, int multiplier = 1) override {
@@ -156,15 +168,21 @@ public:
         }
 
         std::cout << "\nWinner: "
-                  << (player->isAlive() ? player->getName() : monster->getName())
+                  << (player->isAlive()
+                          ? player->getName()
+                          : monster->getName())
                   << "\n";
     }
 };
+
+} // einde namespace rpg
 
 // ----------------------------
 // main
 // ----------------------------
 int main() {
+    using namespace rpg;
+
     Game game;
     game.start();
     return 0;
