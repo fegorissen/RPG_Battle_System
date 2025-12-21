@@ -4,6 +4,7 @@
 #include <random>
 #include <ctime>
 #include <sstream>
+#include <fstream> // ✅ moderne file-I/O
 
 namespace rpg {
 
@@ -33,7 +34,6 @@ protected:
     unsigned char level;
     unsigned char criticalChance;
 
-    // Nuttige bool variabelen
     bool isStunned;
     bool hasShield;
     bool criticalActive;
@@ -90,16 +90,22 @@ public:
         target.health -= damage;
         if(target.health < 0) target.health = 0;
 
+        // Console output
         std::cout << name << " attacks " << target.getName()
                   << " for " << damage << " damage";
         if(criticalHit) std::cout << " (CRITICAL HIT!)";
         if(target.hasShield) std::cout << " [Blocked by shield]";
         std::cout << "\n";
-    }
 
-    void applyDamage(int& targetHealth, const int& damage) {
-        targetHealth -= damage;
-        if(targetHealth < 0) targetHealth = 0;
+        // File output
+        std::ofstream logfile("battle_log.txt", std::ios::app);
+        if(logfile.is_open()) {
+            logfile << name << " attacks " << target.getName()
+            << " for " << damage << " damage";
+            if(criticalHit) logfile << " (CRITICAL HIT!)";
+            if(target.hasShield) logfile << " [Blocked by shield]";
+            logfile << "\n";
+        }
     }
 };
 
@@ -109,10 +115,20 @@ public:
 class BattleLogger {
 public:
     static void logStatus(const Character& c) {
+        // Console
         std::cout << "[LOG] " << c.name
                   << " (Lv " << static_cast<int>(c.level) << ") "
                   << "HP: " << c.health
                   << "/" << c.maxHealth << "\n";
+
+        // File
+        std::ofstream logfile("battle_log.txt", std::ios::app);
+        if(logfile.is_open()) {
+            logfile << "[LOG] " << c.name
+                    << " (Lv " << static_cast<int>(c.level) << ") "
+                    << "HP: " << c.health
+                    << "/" << c.maxHealth << "\n";
+        }
     }
 };
 
@@ -121,21 +137,18 @@ public:
 // ----------------------------
 class Player : public Character {
 private:
-    std::vector<std::string> inventory; // ✅ nuttig gebruik van container klasse
+    std::vector<std::string> inventory;
 
 public:
     Player() : Player("Hero", 100, 18, 1, 20) {}
-
     Player(const std::string& n,
            const int& h,
            const int& a,
            const unsigned char& lvl,
            const unsigned char& crit)
         : Character(n, h, a, lvl, crit), inventory() {}
-
     Player(const Player& other)
         : Character(other), inventory(other.inventory) {}
-
     ~Player() {}
 
     void attack(Character& target, const int& multiplier = 1) override {
@@ -147,10 +160,15 @@ public:
         health += amount;
         if (health > maxHealth) health = maxHealth;
         std::cout << name << " heals for " << amount << " HP!\n";
+
+        std::ofstream logfile("battle_log.txt", std::ios::app);
+        if(logfile.is_open()) {
+            logfile << name << " heals for " << amount << " HP\n";
+        }
     }
 
     void addItem(std::string& item) {
-        inventory.push_back(item); // ✅ nuttig gebruik van container
+        inventory.push_back(item);
     }
 
     std::string showInventory() const {
@@ -171,17 +189,14 @@ public:
 class Monster : public Character {
 public:
     Monster() : Monster("Goblin", 100, 15, 1, 10) {}
-
     Monster(const std::string& n,
             const int& h,
             const int& a,
             const unsigned char& lvl,
             const unsigned char& crit)
         : Character(n, h, a, lvl, crit) {}
-
     Monster(const Monster& other)
         : Character(other) {}
-
     ~Monster() {}
 
     void attack(Character& target, const int& multiplier = 1) override {
@@ -196,7 +211,7 @@ public:
 class Game {
 private:
     Character* player;
-    std::vector<Character*> monsters; // ✅ nuttig gebruik van container klasse
+    std::vector<Character*> monsters;
 
 public:
     Game() {
@@ -208,7 +223,6 @@ public:
     }
 
     ~Game() {
-        // ✅ nuttig gebruik van nullptr bij verwijderen
         if (player != nullptr) {
             delete player;
             player = nullptr;
@@ -230,7 +244,7 @@ public:
     void showAllMonsters() const {
         std::cout << "Monsters in the game:\n";
         for (const auto& m : monsters) {
-            if (m != nullptr) { // ✅ nuttig gebruik van nullptr
+            if (m != nullptr) {
                 std::cout << "- " << m->getName() << " (HP: " << m->getHealth() << ")\n";
             }
         }
@@ -240,11 +254,11 @@ public:
         showAllMonsters();
 
         for (auto& m : monsters) {
-            if (m == nullptr) continue; // ✅ controleer nullptr
+            if (m == nullptr) continue;
 
             std::cout << "\nNext battle: " << m->getName() << "\n";
 
-            while (player != nullptr && player->isAlive() && m->isAlive()) {
+            while(player != nullptr && player->isAlive() && m->isAlive()) {
                 player->attack(*m);
                 BattleLogger::logStatus(*m);
 
@@ -286,7 +300,7 @@ int main() {
     std::string sword = "Sword";
     std::string shield = "Shield";
 
-    if (game.getPlayer() != nullptr) { // ✅ nuttig gebruik van nullptr
+    if(game.getPlayer() != nullptr) {
         game.getPlayer()->addItem(sword);
         game.getPlayer()->addItem(shield);
     }
