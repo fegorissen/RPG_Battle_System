@@ -3,7 +3,7 @@
 #include <vector>
 #include <random>
 #include <ctime>
-#include <sstream> // voor string manipulation
+#include <sstream>
 
 namespace rpg {
 
@@ -65,7 +65,6 @@ public:
     inline bool isAlive() const { return health > 0; }
     inline unsigned char getLevel() const { return level; }
 
-    // Modern call-by-reference #1
     virtual void attack(Character& target, const int& multiplier = 1) {
         if(isStunned) {
             std::cout << name << " is stunned and cannot attack!\n";
@@ -98,7 +97,6 @@ public:
         std::cout << "\n";
     }
 
-    // Modern call-by-reference #2
     void applyDamage(int& targetHealth, const int& damage) {
         targetHealth -= damage;
         if(targetHealth < 0) targetHealth = 0;
@@ -123,7 +121,7 @@ public:
 // ----------------------------
 class Player : public Character {
 private:
-    std::vector<std::string> inventory;
+    std::vector<std::string> inventory; // ✅ nuttig gebruik van container klasse
 
 public:
     Player() : Player("Hero", 100, 18, 1, 20) {}
@@ -152,7 +150,7 @@ public:
     }
 
     void addItem(std::string& item) {
-        inventory.push_back(item);
+        inventory.push_back(item); // ✅ nuttig gebruik van container
     }
 
     std::string showInventory() const {
@@ -198,12 +196,13 @@ public:
 class Game {
 private:
     Character* player;
-    std::vector<Character*> monsters;
+    std::vector<Character*> monsters; // ✅ nuttig gebruik van container klasse
 
 public:
     Game() {
         player = new Player();
 
+        // Voeg monsters toe aan vector
         monsters.push_back(new Monster("Goblin", 80, 12, 1, 10));
         monsters.push_back(new Monster("Orc", 120, 18, 2, 15));
         monsters.push_back(new Monster("Troll", 150, 20, 3, 5));
@@ -218,16 +217,22 @@ public:
         monsters.clear();
     }
 
-    // ✅ Public getter voor Player
     Player* getPlayer() const {
         return dynamic_cast<Player*>(player);
     }
 
+    void showAllMonsters() const {
+        std::cout << "Monsters in the game:\n";
+        for(const auto& m : monsters) { // ✅ nuttig gebruik van container
+            std::cout << "- " << m->getName() << " (HP: " << m->getHealth() << ")\n";
+        }
+    }
+
     void start() {
-        std::cout << "Battle start!\n\n";
+        showAllMonsters(); // toon monsters voor start
 
         for(auto m : monsters) {
-            std::cout << "Next battle: " << m->getName() << "\n";
+            std::cout << "\nNext battle: " << m->getName() << "\n";
 
             while(player->isAlive() && m->isAlive()) {
                 player->attack(*m);
@@ -249,7 +254,7 @@ public:
             if(!player->isAlive()) break;
         }
 
-        std::cout << dynamic_cast<Player*>(player)->showInventory() << "\n";
+        std::cout << "\n" << dynamic_cast<Player*>(player)->showInventory() << "\n";
 
         std::cout << "\nWinner: "
                   << (player->isAlive() ? player->getName() : "Monsters")
@@ -267,7 +272,6 @@ int main() {
 
     Game game;
 
-    // Voeg items toe via getter
     std::string sword = "Sword";
     std::string shield = "Shield";
     game.getPlayer()->addItem(sword);
