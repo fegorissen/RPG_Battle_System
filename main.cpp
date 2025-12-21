@@ -145,7 +145,7 @@ public:
 
     void heal(const int& amount = 20) {
         health += amount;
-        if(health > maxHealth) health = maxHealth;
+        if (health > maxHealth) health = maxHealth;
         std::cout << name << " heals for " << amount << " HP!\n";
     }
 
@@ -154,11 +154,11 @@ public:
     }
 
     std::string showInventory() const {
-        if(inventory.empty()) return name + "'s inventory is empty.";
+        if (inventory.empty()) return name + "'s inventory is empty.";
 
         std::stringstream ss;
         ss << name << "'s Inventory: ";
-        for(const auto& item : inventory) {
+        for (const auto& item : inventory) {
             ss << item << " ";
         }
         return ss.str();
@@ -202,17 +202,23 @@ public:
     Game() {
         player = new Player();
 
-        // Voeg monsters toe aan vector
         monsters.push_back(new Monster("Goblin", 80, 12, 1, 10));
         monsters.push_back(new Monster("Orc", 120, 18, 2, 15));
         monsters.push_back(new Monster("Troll", 150, 20, 3, 5));
     }
 
     ~Game() {
-        delete player;
+        // ✅ nuttig gebruik van nullptr bij verwijderen
+        if (player != nullptr) {
+            delete player;
+            player = nullptr;
+        }
 
-        for(auto m : monsters) {
-            delete m;
+        for (auto& m : monsters) {
+            if (m != nullptr) {
+                delete m;
+                m = nullptr;
+            }
         }
         monsters.clear();
     }
@@ -223,27 +229,31 @@ public:
 
     void showAllMonsters() const {
         std::cout << "Monsters in the game:\n";
-        for(const auto& m : monsters) { // ✅ nuttig gebruik van container
-            std::cout << "- " << m->getName() << " (HP: " << m->getHealth() << ")\n";
+        for (const auto& m : monsters) {
+            if (m != nullptr) { // ✅ nuttig gebruik van nullptr
+                std::cout << "- " << m->getName() << " (HP: " << m->getHealth() << ")\n";
+            }
         }
     }
 
     void start() {
-        showAllMonsters(); // toon monsters voor start
+        showAllMonsters();
 
-        for(auto m : monsters) {
+        for (auto& m : monsters) {
+            if (m == nullptr) continue; // ✅ controleer nullptr
+
             std::cout << "\nNext battle: " << m->getName() << "\n";
 
-            while(player->isAlive() && m->isAlive()) {
+            while (player != nullptr && player->isAlive() && m->isAlive()) {
                 player->attack(*m);
                 BattleLogger::logStatus(*m);
 
-                if(!m->isAlive()) break;
+                if (!m->isAlive()) break;
 
                 m->attack(*player);
                 BattleLogger::logStatus(*player);
 
-                if(player->getHealth() < 40) {
+                if (player->getHealth() < 40) {
                     dynamic_cast<Player*>(player)->heal();
                     BattleLogger::logStatus(*player);
                 }
@@ -251,13 +261,14 @@ public:
                 std::cout << "--------------------\n";
             }
 
-            if(!player->isAlive()) break;
+            if (player == nullptr || !player->isAlive()) break;
         }
 
-        std::cout << "\n" << dynamic_cast<Player*>(player)->showInventory() << "\n";
+        if (player != nullptr)
+            std::cout << "\n" << dynamic_cast<Player*>(player)->showInventory() << "\n";
 
         std::cout << "\nWinner: "
-                  << (player->isAlive() ? player->getName() : "Monsters")
+                  << (player != nullptr && player->isAlive() ? player->getName() : "Monsters")
                   << "\n";
     }
 };
@@ -274,8 +285,11 @@ int main() {
 
     std::string sword = "Sword";
     std::string shield = "Shield";
-    game.getPlayer()->addItem(sword);
-    game.getPlayer()->addItem(shield);
+
+    if (game.getPlayer() != nullptr) { // ✅ nuttig gebruik van nullptr
+        game.getPlayer()->addItem(sword);
+        game.getPlayer()->addItem(shield);
+    }
 
     game.start();
     return 0;
