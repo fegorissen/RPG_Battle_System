@@ -3,6 +3,7 @@
 #include <vector>
 #include <random>
 #include <ctime>
+#include <sstream> // voor string manipulation
 
 namespace rpg {
 
@@ -64,7 +65,7 @@ public:
     inline bool isAlive() const { return health > 0; }
     inline unsigned char getLevel() const { return level; }
 
-    // Modern call-by-reference (1)
+    // Modern call-by-reference #1
     virtual void attack(Character& target, const int& multiplier = 1) {
         if(isStunned) {
             std::cout << name << " is stunned and cannot attack!\n";
@@ -97,7 +98,7 @@ public:
         std::cout << "\n";
     }
 
-    // Modern call-by-reference (2)
+    // Modern call-by-reference #2
     void applyDamage(int& targetHealth, const int& damage) {
         targetHealth -= damage;
         if(targetHealth < 0) targetHealth = 0;
@@ -150,8 +151,19 @@ public:
         std::cout << name << " heals for " << amount << " HP!\n";
     }
 
-    void addItem(std::string& item) { // call-by-reference
+    void addItem(std::string& item) {
         inventory.push_back(item);
+    }
+
+    std::string showInventory() const {
+        if(inventory.empty()) return name + "'s inventory is empty.";
+
+        std::stringstream ss;
+        ss << name << "'s Inventory: ";
+        for(const auto& item : inventory) {
+            ss << item << " ";
+        }
+        return ss.str();
     }
 };
 
@@ -206,6 +218,11 @@ public:
         monsters.clear();
     }
 
+    // ✅ Public getter voor Player
+    Player* getPlayer() const {
+        return dynamic_cast<Player*>(player);
+    }
+
     void start() {
         std::cout << "Battle start!\n\n";
 
@@ -232,6 +249,8 @@ public:
             if(!player->isAlive()) break;
         }
 
+        std::cout << dynamic_cast<Player*>(player)->showInventory() << "\n";
+
         std::cout << "\nWinner: "
                   << (player->isAlive() ? player->getName() : "Monsters")
                   << "\n";
@@ -247,6 +266,13 @@ int main() {
     using namespace rpg;
 
     Game game;
+
+    // Voeg items toe via getter
+    std::string sword = "Sword";
+    std::string shield = "Shield";
+    game.getPlayer()->addItem(sword);
+    game.getPlayer()->addItem(shield);
+
     game.start();
     return 0;
 }
