@@ -80,13 +80,15 @@ public:
         bool criticalHit = critRoll(rng) <= criticalChance;
         criticalActive = criticalHit;
 
-        int rawDamage = calculateDamage<int>(attackPower, multiplier);
-        int damage = calculateDamage<int>(
-            rawDamage,
-            variation(rng) / 10.0 * (criticalHit ? 2.0 : 1.0)
-            );
+        // Lambda voor damage berekening
+        auto computeDamage = [&](int base, double mod) -> int {
+            int dmg = static_cast<int>(base * mod);
+            if(target.hasShield) dmg /= 2;
+            return dmg;
+        };
 
-        if(target.hasShield) damage /= 2;
+        int rawDamage = calculateDamage<int>(attackPower, multiplier);
+        int damage = computeDamage(rawDamage, variation(rng) / 10.0 * (criticalHit ? 2.0 : 1.0));
 
         target.health -= damage;
         if(target.health < 0) target.health = 0;
@@ -186,9 +188,11 @@ public:
 
         std::stringstream ss;
         ss << name << "'s Inventory: ";
-        for (const auto& item : inventory) {
-            ss << item << " ";
-        }
+
+        // Lambda voor items toevoegen
+        auto addItemToStream = [&](const std::string& item){ ss << item << " "; };
+        for (const auto& item : inventory) addItemToStream(item);
+
         return ss.str();
     }
 };
@@ -227,7 +231,6 @@ public:
     Game() {
         try {
             player = new Player();
-
             monsters.push_back(new Monster("Goblin", 80, 12, 1, 10));
             monsters.push_back(new Monster("Orc", 120, 18, 2, 15));
             monsters.push_back(new Monster("Troll", 150, 20, 3, 5));
@@ -239,17 +242,8 @@ public:
     }
 
     ~Game() {
-        if (player != nullptr) {
-            delete player;
-            player = nullptr;
-        }
-
-        for (auto& m : monsters) {
-            if (m != nullptr) {
-                delete m;
-                m = nullptr;
-            }
-        }
+        if (player != nullptr) { delete player; player = nullptr; }
+        for (auto& m : monsters) { if(m != nullptr) { delete m; m=nullptr; } }
         monsters.clear();
     }
 
