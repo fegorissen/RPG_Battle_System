@@ -5,9 +5,23 @@
 #include <ctime>
 
 // ----------------------------
+// Template functie
+// ----------------------------
+template<typename T>
+T calculateDamage(T baseDamage, double multiplier = 1.0) {
+    return static_cast<T>(baseDamage * multiplier);
+}
+
+// Forward declaration
+class BattleLogger;
+
+// ----------------------------
 // Abstracte basisklasse Character
 // ----------------------------
 class Character {
+    // OOP-eis: nuttige friend class
+    friend class BattleLogger;
+
 protected:
     std::string name;
     int health;
@@ -19,28 +33,42 @@ public:
         : name(n), health(h), attackPower(a), maxHealth(h) {}
 
     Character(const Character& other)
-        : name(other.name), health(other.health), attackPower(other.attackPower), maxHealth(other.maxHealth) {}
+        : name(other.name), health(other.health),
+        attackPower(other.attackPower), maxHealth(other.maxHealth) {}
 
     virtual ~Character() {}
 
-    std::string getName() const { return name; }
-    int getHealth() const { return health; }
-    int getMaxHealth() const { return maxHealth; }
-    void setHealth(int h) { health = h; }
+    inline std::string getName() const { return name; }
+    inline int getHealth() const { return health; }
+    inline int getMaxHealth() const { return maxHealth; }
+    inline bool isAlive() const { return health > 0; }
 
-    virtual void attack(Character& target, int multiplier = 1) { // Standaardwaarde toegevoegd
+    virtual void attack(Character& target, int multiplier = 1) {
         static std::mt19937 rng(static_cast<unsigned>(time(nullptr)));
-        std::uniform_int_distribution<int> damageDist(static_cast<int>(attackPower * 0.8 * multiplier),
-                                                      static_cast<int>(attackPower * 1.2 * multiplier));
-        int damage = damageDist(rng);
+        std::uniform_int_distribution<int> variation(8, 12);
+
+        int rawDamage = calculateDamage<int>(attackPower, multiplier);
+        int damage = calculateDamage<int>(rawDamage, variation(rng) / 10.0);
+
         target.health -= damage;
         if (target.health < 0) target.health = 0;
 
         std::cout << name << " attacks " << target.getName()
-                  << " for " << damage << " damage! (Target HP: " << target.getHealth() << ")\n";
+                  << " for " << damage << " damage!\n";
     }
+};
 
-    bool isAlive() const { return health > 0; }
+// ----------------------------
+// Friend class
+// ----------------------------
+// OOP-eis: nuttige friend functie/klasse
+class BattleLogger {
+public:
+    static void logStatus(const Character& c) {
+        std::cout << "[LOG] " << c.name
+                  << " HP: " << c.health
+                  << "/" << c.maxHealth << "\n";
+    }
 };
 
 // ----------------------------
@@ -51,28 +79,22 @@ private:
     std::vector<std::string> inventory;
 
 public:
-    Player() : Player("DefaultHero", 100, 12) {}
-    Player(const std::string& n, int h, int a) : Character(n, h, a), inventory() {}
-    Player(const Player& other) : Character(other), inventory(other.inventory) {}
-    ~Player() { std::cout << name << " has been destroyed.\n"; }
+    Player() : Player("Hero", 100, 15) {}
+    Player(const std::string& n, int h, int a)
+        : Character(n, h, a), inventory() {}
+    Player(const Player& other)
+        : Character(other), inventory(other.inventory) {}
+    ~Player() {}
 
-    void addItem(const std::string& item) { inventory.push_back(item); }
-    void showInventory() const {
-        std::cout << name << "'s Inventory: ";
-        for (auto& item : inventory) std::cout << item << " ";
-        std::cout << "\n";
-    }
-
-    void attack(Character& target, int multiplier = 1) override { // polymorfisme + standaardwaarde
+    void attack(Character& target, int multiplier = 1) override {
         std::cout << name << " bravely attacks!\n";
         Character::attack(target, multiplier);
     }
 
-    // Nuttige lidfunctie: heal met standaardwaarde
-    void heal(int amount = 20) { // standaardwaarde 20 HP
+    void heal(int amount = 20) {
         health += amount;
         if (health > maxHealth) health = maxHealth;
-        std::cout << name << " heals for " << amount << " HP! (Current HP: " << health << ")\n";
+        std::cout << name << " heals for " << amount << " HP!\n";
     }
 };
 
@@ -81,10 +103,12 @@ public:
 // ----------------------------
 class Monster : public Character {
 public:
-    Monster() : Monster("DefaultGoblin", 100, 10) {}
-    Monster(const std::string& n, int h, int a) : Character(n, h, a) {}
-    Monster(const Monster& other) : Character(other) {}
-    ~Monster() { std::cout << name << " has been destroyed.\n"; }
+    Monster() : Monster("Goblin", 100, 12) {}
+    Monster(const std::string& n, int h, int a)
+        : Character(n, h, a) {}
+    Monster(const Monster& other)
+        : Character(other) {}
+    ~Monster() {}
 
     void attack(Character& target, int multiplier = 1) override {
         std::cout << name << " fiercely attacks!\n";
@@ -93,7 +117,7 @@ public:
 };
 
 // ----------------------------
-// Game class (object composition)
+// Game class
 // ----------------------------
 class Game {
 private:
@@ -102,8 +126,8 @@ private:
 
 public:
     Game() {
-        player = new Player("Hero", 100, 12);
-        monster = new Monster("Goblin", 100, 10);
+        player = new Player();
+        monster = new Monster();
     }
 
     ~Game() {
@@ -112,41 +136,33 @@ public:
     }
 
     void start() {
-        std::cout << "Battle begins between " << player->getName()
-        << " (HP: " << player->getHealth() << "/" << player->getMaxHealth() << ") and "
-        << monster->getName() << " (HP: " << monster->getHealth() << "/" << monster->getMaxHealth() << ")!\n\n";
-
-        std::mt19937 rng(static_cast<unsigned>(time(nullptr)));
-        std::uniform_int_distribution<int> coin(0,1);
-        bool playerTurn = coin(rng) == 0;
+        std::cout << "Battle start!\n\n";
 
         while (player->isAlive() && monster->isAlive()) {
-            if (playerTurn) {
-                player->attack(*monster); // polymorfie
-                if (monster->isAlive()) monster->attack(*player);
-            } else {
-                monster->attack(*player);
-                if (player->isAlive()) player->attack(*monster);
+            player->attack(*monster);
+            BattleLogger::logStatus(*monster);
+
+            if (!monster->isAlive()) break;
+
+            monster->attack(*player);
+            BattleLogger::logStatus(*player);
+
+            if (player->getHealth() < 40) {
+                dynamic_cast<Player*>(player)->heal();
+                BattleLogger::logStatus(*player);
             }
 
-            // Voorbeeld: Player geneest soms automatisch (optioneel)
-            if (playerTurn && player->getHealth() < 50) {
-                dynamic_cast<Player*>(player)->heal(); // standaard heal van 20 HP
-            }
-
-            playerTurn = !playerTurn;
+            std::cout << "--------------------\n";
         }
 
-        std::cout << "\nBattle Result: ";
-        if (player->isAlive())
-            std::cout << player->getName() << " wins!\n";
-        else
-            std::cout << monster->getName() << " wins!\n";
+        std::cout << "\nWinner: "
+                  << (player->isAlive() ? player->getName() : monster->getName())
+                  << "\n";
     }
 };
 
 // ----------------------------
-// main functie
+// main
 // ----------------------------
 int main() {
     Game game;
