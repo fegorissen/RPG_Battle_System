@@ -6,6 +6,8 @@
 #include <sstream>
 #include <fstream>
 #include <exception>
+#include <thread>
+#include <chrono>
 
 namespace rpg {
 
@@ -80,7 +82,6 @@ public:
         bool criticalHit = critRoll(rng) <= criticalChance;
         criticalActive = criticalHit;
 
-        // Lambda voor damage berekening
         auto computeDamage = [&](int base, double mod) -> int {
             int dmg = static_cast<int>(base * mod);
             if(target.hasShield) dmg /= 2;
@@ -93,14 +94,12 @@ public:
         target.health -= damage;
         if(target.health < 0) target.health = 0;
 
-        // Console output
         std::cout << name << " attacks " << target.getName()
                   << " for " << damage << " damage";
         if(criticalHit) std::cout << " (CRITICAL HIT!)";
         if(target.hasShield) std::cout << " [Blocked by shield]";
         std::cout << "\n";
 
-        // File output with exception handling
         try {
             std::ofstream logfile("battle_log.txt", std::ios::app);
             if (!logfile) throw std::ios_base::failure("Cannot open battle_log.txt");
@@ -121,13 +120,11 @@ public:
 class BattleLogger {
 public:
     static void logStatus(const Character& c) {
-        // Console
         std::cout << "[LOG] " << c.name
                   << " (Lv " << static_cast<int>(c.level) << ") "
                   << "HP: " << c.health
                   << "/" << c.maxHealth << "\n";
 
-        // File with exception handling
         try {
             std::ofstream logfile("battle_log.txt", std::ios::app);
             if (!logfile) throw std::ios_base::failure("Cannot open battle_log.txt");
@@ -179,20 +176,14 @@ public:
         }
     }
 
-    void addItem(std::string& item) {
-        inventory.push_back(item);
-    }
+    void addItem(std::string& item) { inventory.push_back(item); }
 
     std::string showInventory() const {
         if (inventory.empty()) return name + "'s inventory is empty.";
-
         std::stringstream ss;
         ss << name << "'s Inventory: ";
-
-        // Lambda voor items toevoegen
         auto addItemToStream = [&](const std::string& item){ ss << item << " "; };
         for (const auto& item : inventory) addItemToStream(item);
-
         return ss.str();
     }
 };
@@ -220,7 +211,7 @@ public:
 };
 
 // ----------------------------
-// Game class
+// Game class met threads
 // ----------------------------
 class Game {
 private:
@@ -242,19 +233,17 @@ public:
     }
 
     ~Game() {
-        if (player != nullptr) { delete player; player = nullptr; }
-        for (auto& m : monsters) { if(m != nullptr) { delete m; m=nullptr; } }
+        if (player) { delete player; player = nullptr; }
+        for (auto& m : monsters) { if(m) { delete m; m=nullptr; } }
         monsters.clear();
     }
 
-    Player* getPlayer() const {
-        return dynamic_cast<Player*>(player);
-    }
+    Player* getPlayer() const { return dynamic_cast<Player*>(player); }
 
     void showAllMonsters() const {
         std::cout << "Monsters in the game:\n";
         for (const auto& m : monsters) {
-            if (m != nullptr) {
+            if (m) {
                 std::cout << "- " << m->getName() << " (HP: " << m->getHealth() << ")\n";
             }
         }
@@ -264,18 +253,27 @@ public:
         showAllMonsters();
 
         for (auto& m : monsters) {
-            if (m == nullptr) continue;
+            if (!m) continue;
 
             std::cout << "\nNext battle: " << m->getName() << "\n";
 
-            while(player != nullptr && player->isAlive() && m->isAlive()) {
-                player->attack(*m);
-                BattleLogger::logStatus(*m);
+            while(player && player->isAlive() && m->isAlive()) {
 
-                if (!m->isAlive()) break;
+                std::thread playerThread([&]() {
+                    player->attack(*m);
+                    BattleLogger::logStatus(*m);
+                });
 
-                m->attack(*player);
-                BattleLogger::logStatus(*player);
+                std::thread monsterThread([&]() {
+                    std::this_thread::sleep_for(std::chrono::milliseconds(100));
+                    if (m->isAlive()) {
+                        m->attack(*player);
+                        BattleLogger::logStatus(*player);
+                    }
+                });
+
+                playerThread.join();
+                monsterThread.join();
 
                 if (player->getHealth() < 40) {
                     dynamic_cast<Player*>(player)->heal();
@@ -285,14 +283,14 @@ public:
                 std::cout << "--------------------\n";
             }
 
-            if (player == nullptr || !player->isAlive()) break;
+            if (!player || !player->isAlive()) break;
         }
 
-        if (player != nullptr)
+        if (player)
             std::cout << "\n" << dynamic_cast<Player*>(player)->showInventory() << "\n";
 
         std::cout << "\nWinner: "
-                  << (player != nullptr && player->isAlive() ? player->getName() : "Monsters")
+                  << (player && player->isAlive() ? player->getName() : "Monsters")
                   << "\n";
     }
 };
@@ -311,7 +309,7 @@ int main() {
         std::string sword = "Sword";
         std::string shield = "Shield";
 
-        if(game.getPlayer() != nullptr) {
+        if(game.getPlayer()) {
             game.getPlayer()->addItem(sword);
             game.getPlayer()->addItem(shield);
         }
