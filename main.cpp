@@ -32,6 +32,12 @@ protected:
     unsigned char level;
     unsigned char criticalChance;
 
+    // ✅ Nuttige bool variabelen
+    bool isStunned;
+    bool hasShield;
+    bool criticalActive;
+    bool isPoisoned;
+
 public:
     Character(const std::string& n,
               const int& h,
@@ -39,12 +45,16 @@ public:
               const unsigned char& lvl = 1,
               const unsigned char& crit = 10)
         : name(n), health(h), attackPower(a), maxHealth(h),
-        level(lvl), criticalChance(crit) {}
+        level(lvl), criticalChance(crit),
+        isStunned(false), hasShield(false),
+        criticalActive(false), isPoisoned(false) {}
 
     Character(const Character& other)
         : name(other.name), health(other.health),
         attackPower(other.attackPower), maxHealth(other.maxHealth),
-        level(other.level), criticalChance(other.criticalChance) {}
+        level(other.level), criticalChance(other.criticalChance),
+        isStunned(other.isStunned), hasShield(other.hasShield),
+        criticalActive(other.criticalActive), isPoisoned(other.isPoisoned) {}
 
     virtual ~Character() {}
 
@@ -55,11 +65,18 @@ public:
     inline unsigned char getLevel() const { return level; }
 
     virtual void attack(Character& target, const int& multiplier = 1) {
+        if(isStunned) {
+            std::cout << name << " is stunned and cannot attack!\n";
+            isStunned = false; // stunned only for 1 turn
+            return;
+        }
+
         static std::mt19937 rng(static_cast<unsigned>(time(nullptr)));
         std::uniform_int_distribution<int> variation(8, 12);
         std::uniform_int_distribution<int> critRoll(1, 100);
 
         bool criticalHit = critRoll(rng) <= criticalChance;
+        criticalActive = criticalHit;
 
         int rawDamage = calculateDamage<int>(attackPower, multiplier);
         int damage = calculateDamage<int>(
@@ -67,12 +84,15 @@ public:
             variation(rng) / 10.0 * (criticalHit ? 2.0 : 1.0)
             );
 
+        if(target.hasShield) damage /= 2;
+
         target.health -= damage;
-        if (target.health < 0) target.health = 0;
+        if(target.health < 0) target.health = 0;
 
         std::cout << name << " attacks " << target.getName()
                   << " for " << damage << " damage";
-        if (criticalHit) std::cout << " (CRITICAL HIT!)";
+        if(criticalHit) std::cout << " (CRITICAL HIT!)";
+        if(target.hasShield) std::cout << " [Blocked by shield]";
         std::cout << "\n";
     }
 };
@@ -119,7 +139,7 @@ public:
 
     void heal(const int& amount = 20) {
         health += amount;
-        if (health > maxHealth) health = maxHealth;
+        if(health > maxHealth) health = maxHealth;
         std::cout << name << " heals for " << amount << " HP!\n";
     }
 };
@@ -171,16 +191,16 @@ public:
     void start() {
         std::cout << "Battle start!\n\n";
 
-        while (player->isAlive() && monster->isAlive()) {
+        while(player->isAlive() && monster->isAlive()) {
             player->attack(*monster);
             BattleLogger::logStatus(*monster);
 
-            if (!monster->isAlive()) break;
+            if(!monster->isAlive()) break;
 
             monster->attack(*player);
             BattleLogger::logStatus(*player);
 
-            if (player->getHealth() < 40) {
+            if(player->getHealth() < 40) {
                 dynamic_cast<Player*>(player)->heal();
                 BattleLogger::logStatus(*player);
             }
@@ -189,9 +209,7 @@ public:
         }
 
         std::cout << "\nWinner: "
-                  << (player->isAlive()
-                          ? player->getName()
-                          : monster->getName())
+                  << (player->isAlive() ? player->getName() : monster->getName())
                   << "\n";
     }
 };
