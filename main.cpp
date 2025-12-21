@@ -38,20 +38,13 @@ public:
               const int& a,
               const unsigned char& lvl = 1,
               const unsigned char& crit = 10)
-        : name(n),
-        health(h),
-        attackPower(a),
-        maxHealth(h),
-        level(lvl),
-        criticalChance(crit) {}
+        : name(n), health(h), attackPower(a), maxHealth(h),
+        level(lvl), criticalChance(crit) {}
 
     Character(const Character& other)
-        : name(other.name),
-        health(other.health),
-        attackPower(other.attackPower),
-        maxHealth(other.maxHealth),
-        level(other.level),
-        criticalChance(other.criticalChance) {}
+        : name(other.name), health(other.health),
+        attackPower(other.attackPower), maxHealth(other.maxHealth),
+        level(other.level), criticalChance(other.criticalChance) {}
 
     virtual ~Character() {}
 
@@ -61,7 +54,7 @@ public:
     inline bool isAlive() const { return health > 0; }
     inline unsigned char getLevel() const { return level; }
 
-    virtual void attack(Character& target, int multiplier = 1) {
+    virtual void attack(Character& target, const int& multiplier = 1) {
         static std::mt19937 rng(static_cast<unsigned>(time(nullptr)));
         std::uniform_int_distribution<int> variation(8, 12);
         std::uniform_int_distribution<int> critRoll(1, 100);
@@ -119,7 +112,7 @@ public:
 
     ~Player() {}
 
-    void attack(Character& target, int multiplier = 1) override {
+    void attack(Character& target, const int& multiplier = 1) override {
         std::cout << name << " bravely attacks!\n";
         Character::attack(target, multiplier);
     }
@@ -150,7 +143,7 @@ public:
 
     ~Monster() {}
 
-    void attack(Character& target, int multiplier = 1) override {
+    void attack(Character& target, const int& multiplier = 1) override {
         std::cout << name << " fiercely attacks!\n";
         Character::attack(target, multiplier);
     }
